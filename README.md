@@ -42,17 +42,62 @@ export JIMENG_SECRET_KEY="你的火山引擎SecretKey"
 
 ## 使用方法
 
-### 直接运行
+### 方式一: 使用 npx (推荐)
 
-```bash
-node build/index.js
+无需安装,直接在 MCP 客户端配置中使用:
+
+**配置文件位置:**
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+
+**配置内容:**
+```json
+{
+  "mcpServers": {
+    "jimeng-mcp-v4": {
+      "command": "npx",
+      "args": ["-y", "jimeng-mcp-v4@latest"],
+      "env": {
+        "JIMENG_ACCESS_KEY": "你的AccessKey",
+        "JIMENG_SECRET_KEY": "你的SecretKey"
+      }
+    }
+  }
+}
 ```
 
-### 作为 MCP 服务器
+### 方式二: 全局安装
 
-在 MCP 客户端（如 Claude Desktop、Cursor 等）中配置此服务：
+```bash
+# 安装
+npm install -g jimeng-mcp-v4
 
-```json
+# 在配置文件中使用
+{
+  "mcpServers": {
+    "jimeng-mcp-v4": {
+      "command": "jimeng-mcp-v4",
+      "env": {
+        "JIMENG_ACCESS_KEY": "你的AccessKey",
+        "JIMENG_SECRET_KEY": "你的SecretKey"
+      }
+    }
+  }
+}
+```
+
+### 方式三: 本地开发
+
+```bash
+# 克隆仓库
+git clone https://github.com/yo4ai/jimeng-mcp-v4.git
+cd jimeng-mcp-v4
+
+# 安装依赖并构建
+npm install
+npm run build
+
+# 在配置文件中使用
 {
   "mcpServers": {
     "jimeng-mcp-v4": {
