@@ -1,29 +1,44 @@
 {
   "name": "jimeng-mcp-v4",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "./build/index.js",
   "type": "module",
   "bin": {
-    "jimengpic": "./build/index.js"
+    "jimeng-mcp-v4": "./build/index.js"
   },
   "scripts": {
     "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
+    "prepublishOnly": "npm run build",
     "test": "node test.js",
     "start": "node build/index.js"
   },
   "files": [
-    "build"
+    "build",
+    "README.md",
+    "LICENSE"
   ],
   "keywords": [
     "mcp",
     "jimeng",
     "ai",
     "image-generation",
-    "jimeng-mcp-v4"
+    "jimeng-mcp-v4",
+    "model-context-protocol"
   ],
-  "author": "",
-  "license": "ISC",
+  "author": "panhaisa",
+  "license": "MIT",
   "description": "即梦AI图片生成MCP服务支持V4版本",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yo4ai/jimeng-mcp-v4.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yo4ai/jimeng-mcp-v4/issues"
+  },
+  "homepage": "https://github.com/yo4ai/jimeng-mcp-v4#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "devDependencies": {
     "@types/node": "^22.10.0",
     "typescript": "^5.7.2"

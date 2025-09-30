@@ -47,21 +47,21 @@ function signV4Request(
   const t = new Date();
   const currentDate = t.toISOString().replace(/[:\-]|\.\d{3}/g, '');
   const datestamp = currentDate.substring(0, 8);
-  
+
   const method = 'POST';
   const canonicalUri = '/';
   const canonicalQuerystring = reqQuery;
   const signedHeaders = 'content-type;host;x-content-sha256;x-date';
   const payloadHash = crypto.createHash('sha256').update(reqBody).digest('hex');
   const contentType = 'application/json';
-  
+
   const canonicalHeaders = [
     `content-type:${contentType}`,
     `host:${HOST}`,
     `x-content-sha256:${payloadHash}`,
     `x-date:${currentDate}`
   ].join('\n') + '\n';
-  
+
   const canonicalRequest = [
     method,
     canonicalUri,
@@ -70,7 +70,7 @@ function signV4Request(
     signedHeaders,
     payloadHash
   ].join('\n');
-  
+
   const algorithm = 'HMAC-SHA256';
   const credentialScope = `${datestamp}/${REGION}/${service}/request`;
   const stringToSign = [
@@ -79,21 +79,21 @@ function signV4Request(
     credentialScope,
     crypto.createHash('sha256').update(canonicalRequest).digest('hex')
   ].join('\n');
-  
+
   const signingKey = getSignatureKey(secretKey, datestamp, REGION, service);
   const signature = crypto.createHmac('sha256', signingKey).update(stringToSign).digest('hex');
-  
+
   const authorizationHeader = `${algorithm} Credential=${accessKey}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
-  
+
   const headers = {
     'X-Date': currentDate,
     'Authorization': authorizationHeader,
     'X-Content-Sha256': payloadHash,
     'Content-Type': contentType
   };
-  
+
   const requestUrl = `${ENDPOINT}?${canonicalQuerystring}`;
-  
+
   return { headers, requestUrl };
 }
 
@@ -140,7 +140,7 @@ async function callJimengAPI(prompt: string): Promise<string | null> {
     // 替换转义字符，与Python示例保持一致
     const cleanedResponse = responseText.replace(/\\u0026/g, "&");
     const result = JSON.parse(cleanedResponse);
-    
+
     // 根据火山引擎即梦AI API响应格式解析结果
     if (result.ResponseMetadata && result.ResponseMetadata.Error) {
       throw new Error(`API error: ${result.ResponseMetadata.Error.Message || 'Unknown error'}`);
@@ -150,7 +150,7 @@ async function callJimengAPI(prompt: string): Promise<string | null> {
     if (result.data && result.data.image_urls && result.data.image_urls.length > 0) {
       return result.data.image_urls[0];
     }
-    
+
     return null;
   } catch (error) {
     console.error("调用即梦AI API时出错:", error);
@@ -160,7 +160,7 @@ async function callJimengAPI(prompt: string): Promise<string | null> {
 
 // 创建MCP服务器实例
 const server = new McpServer({
-  name: "jimengpic",
+  name: "jimeng-mcp-v4",
   version: "1.0.0",
 });
 
@@ -171,7 +171,8 @@ server.tool(
   {
     prompt: z.string().describe("用于生成图像的提示词，中英文均可，最长不超过800字符。可以在prompt中描述图片内容、风格、尺寸比例等。API会智能判断生成2K分辨率图像。")
   },
-  async ({ prompt }: { prompt: string }) => {
+  async (args) => {
+    const { prompt } = args as { prompt: string };
     // 检查API密钥是否配置
     if (!JIMENG_ACCESS_KEY || !JIMENG_SECRET_KEY) {
       return {
